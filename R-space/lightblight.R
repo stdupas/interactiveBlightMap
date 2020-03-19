@@ -126,15 +126,16 @@ DayR <- function(weather_data, min_year, max_year) {
               # Hours are 13:00 - 23:00, 0:00 - 12:00
               # Note that the last day of the last year is excluded
               tDay <- subset(t_month, day == iDay)
+              tDay2 <- NULL
               tC[1:12] <- tDay$temperature[13:24]
               tRH[1:12] <- tDay$relativeHumidity[13:24]
               if (iDay < maxDay) {
                 tDay2 <- subset(t_month, day == iDay + 1)
-              }
-              # 100201 - Was "else if"????  Incorrect???
-              if (i_month < 12) {
+              }else if (i_month < 12) {
                 t_month2 <- subset(tYear, month == i_month + 1)
                 tDay2 <- subset(t_month2, day == 1)
+              }else{
+                
               }
               
               tC[13:24] <- tDay2$temperature[1:12]
@@ -197,7 +198,7 @@ ConsR <- function(tRH, tC) {
     }
   }
   cons_out <- data.frame(tcons, consmc)
-  return(cons_out)
+  cons_out
 }
 
 ## Blight Unit Calculation
