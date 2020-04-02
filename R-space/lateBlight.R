@@ -140,7 +140,7 @@ DayR <- function(weather_data, min_year, max_year) {
               
               tC[13:24] <- tDay2$temperature[1:12]
               tRH[13:24] <- tDay2$relativeHumidity[1:12]
-              if(sum(is.na(tDay2$temperature[1:12])) == 0 & sum(is.na(tDay2$relativeHumidity[1:12])) == 0 & sum(is.na(tDay$temperature[13:24])) == 0 & sum(is.na(tDay$relativeHumidity[13:24])) == 0)
+              if(sum(is.na(tC)) == 0 & sum(is.na(tRH)) == 0)
               {
               out1 <- ConsR(tC  =  tC, tRH  =  tRH)
               out2 <-
