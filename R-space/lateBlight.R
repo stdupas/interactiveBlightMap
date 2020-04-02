@@ -32,7 +32,7 @@ resistance = "S"
 # Load libraries ---------------------------------------------------------------
 setwd("/Users/josedanielcardenasrincon/Documents/map.agromakers/R-space")
 library("readr")
-
+install.packages("readr")
 ConsR <- NULL
 DayR <- NULL
 blightR <- NULL
@@ -71,11 +71,9 @@ DailyBlightUnitFiles <- function() {
     } else
       resistance <- "resistant"
     filename <- paste0(basename(i), resistance, "_dayR.txt")
-    write_tsv(
+    write.csv(
       weather_data,
-      path = paste0("Cache/Blight Units/", filename),
-      col_names = FALSE,
-      append = FALSE
+      file = paste0("Cache/Blight Units/", filename),
     )
   }
 }
@@ -406,5 +404,8 @@ blightR <- function(consmc, tcons, resistance) {
   }
   return(blight_unit)
 }
+
+
+DailyBlightUnitFiles()
 
 # eos
