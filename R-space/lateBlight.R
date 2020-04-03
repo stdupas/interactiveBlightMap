@@ -31,7 +31,7 @@ resistance = "S"
 
 # Load libraries ---------------------------------------------------------------
 setwd("/Users/josedanielcardenasrincon/Documents/map.agromakers/R-space")
-library("readr")
+#library("readr")
 install.packages("readr")
 ConsR <- NULL
 DayR <- NULL
