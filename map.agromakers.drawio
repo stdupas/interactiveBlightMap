@@ -1,4 +1,4 @@
-<mxfile host="www.draw.io" modified="2020-04-03T16:25:36.484Z" agent="5.0 (X11)" etag="Mi4RDCahnEmHyVnIB0jY" version="12.9.6" type="github">
+<mxfile host="www.draw.io" modified="2020-04-03T16:27:03.274Z" agent="5.0 (X11)" etag="IQJFVLSbgZpxAo8BRg68" version="12.9.6" type="github">
   <diagram id="Jp8tda-DwW-DgcWddvx5" name="Page-1">
     <mxGraphModel dx="1115" dy="773" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
@@ -83,8 +83,13 @@
         <mxCell id="RNud2RT-OnFLoZX_OF3f-43" value="Until Day max" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.loop_limit;whiteSpace=wrap;" parent="1" vertex="1">
           <mxGeometry x="339" y="510" width="100" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="RNud2RT-OnFLoZX_OF3f-50" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;" parent="1" source="RNud2RT-OnFLoZX_OF3f-44" target="RNud2RT-OnFLoZX_OF3f-47" edge="1">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="RNud2RT-OnFLoZX_OF3f-50" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.15;entryY=0.532;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="RNud2RT-OnFLoZX_OF3f-44" target="RNud2RT-OnFLoZX_OF3f-47" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="70" y="540" />
+              <mxPoint x="70" y="704" />
+            </Array>
+          </mxGeometry>
         </mxCell>
         <mxCell id="RNud2RT-OnFLoZX_OF3f-53" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="RNud2RT-OnFLoZX_OF3f-43" target="RNud2RT-OnFLoZX_OF3f-16" edge="1">
           <mxGeometry relative="1" as="geometry" />
@@ -92,20 +97,20 @@
         <mxCell id="RNud2RT-OnFLoZX_OF3f-44" value="Loop days" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.start_1;whiteSpace=wrap;" parent="1" vertex="1">
           <mxGeometry x="184" y="510" width="100" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="RNud2RT-OnFLoZX_OF3f-51" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="RNud2RT-OnFLoZX_OF3f-49" target="RNud2RT-OnFLoZX_OF3f-43" edge="1">
+        <mxCell id="RNud2RT-OnFLoZX_OF3f-51" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.99;exitY=0.494;exitDx=0;exitDy=0;exitPerimeter=0;" parent="1" source="RNud2RT-OnFLoZX_OF3f-49" target="RNud2RT-OnFLoZX_OF3f-43" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="RNud2RT-OnFLoZX_OF3f-46" value="Process Bar" style="swimlane;childLayout=stackLayout;horizontal=1;fillColor=none;horizontalStack=1;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;strokeColor=none;stackBorder=10;stackSpacing=-12;resizable=1;align=center;points=[];fontColor=#000000;" parent="1" vertex="1">
-          <mxGeometry x="50" y="630" width="338" height="120" as="geometry" />
+          <mxGeometry x="83" y="630" width="358" height="120" as="geometry" />
         </mxCell>
-        <mxCell id="RNud2RT-OnFLoZX_OF3f-47" value="Select hours&#xa;from 13h to &#xa;12h dia 2" style="shape=step;perimeter=stepPerimeter;fixedSize=1;points=[];spacing=0;" parent="RNud2RT-OnFLoZX_OF3f-46" vertex="1">
-          <mxGeometry x="10" y="33" width="120" height="77" as="geometry" />
+        <mxCell id="RNud2RT-OnFLoZX_OF3f-47" value="Select hours&#xa;from 13h día 1 &#xa;to 12h dia 2" style="shape=step;perimeter=stepPerimeter;fixedSize=1;points=[];spacing=0;" parent="RNud2RT-OnFLoZX_OF3f-46" vertex="1">
+          <mxGeometry x="10" y="33" width="140" height="77" as="geometry" />
         </mxCell>
         <mxCell id="RNud2RT-OnFLoZX_OF3f-48" value="Calculate Tº &#xa;and t in&#xa;consecutive &#xa;periods &#xa;above 90%RH" style="shape=step;perimeter=stepPerimeter;fixedSize=1;points=[];" parent="RNud2RT-OnFLoZX_OF3f-46" vertex="1">
-          <mxGeometry x="118" y="33" width="122" height="77" as="geometry" />
+          <mxGeometry x="138" y="33" width="122" height="77" as="geometry" />
         </mxCell>
         <mxCell id="RNud2RT-OnFLoZX_OF3f-49" value="Calculate &#xa;BlightR" style="shape=step;perimeter=stepPerimeter;fixedSize=1;points=[];" parent="RNud2RT-OnFLoZX_OF3f-46" vertex="1">
-          <mxGeometry x="228" y="33" width="100" height="77" as="geometry" />
+          <mxGeometry x="248" y="33" width="100" height="77" as="geometry" />
         </mxCell>
         <mxCell id="RNud2RT-OnFLoZX_OF3f-34" value="Wheather temporal map data frame" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=none;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;" parent="1" vertex="1">
           <mxGeometry x="590" y="90" width="196" height="156" as="geometry" />
