@@ -1,4 +1,4 @@
-<mxfile host="www.draw.io" modified="2020-04-03T16:28:59.866Z" agent="5.0 (X11)" etag="RiJZ1lRZ-gkkqPCyHGjK" version="12.9.6" type="github">
+<mxfile host="www.draw.io" modified="2020-04-03T17:07:06.188Z" agent="5.0 (X11)" etag="XIvxDjUUR9qjdlT-PmIP" version="12.9.6" type="github">
   <diagram id="Jp8tda-DwW-DgcWddvx5" name="Page-1">
     <mxGraphModel dx="1115" dy="773" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
@@ -32,7 +32,7 @@
         <mxCell id="RNud2RT-OnFLoZX_OF3f-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="RNud2RT-OnFLoZX_OF3f-7" target="RNud2RT-OnFLoZX_OF3f-10" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="RNud2RT-OnFLoZX_OF3f-7" value="Crear chron columna library chron" style="verticalLabelPosition=bottom;verticalAlign=top;html=1;shape=hexagon;perimeter=hexagonPerimeter2;arcSize=6;size=0.27;" parent="1" vertex="1">
+        <mxCell id="RNud2RT-OnFLoZX_OF3f-7" value="Crear chron columna &lt;br&gt;library chron" style="verticalLabelPosition=bottom;verticalAlign=top;html=1;shape=hexagon;perimeter=hexagonPerimeter2;arcSize=6;size=0.27;" parent="1" vertex="1">
           <mxGeometry x="320" y="95" width="100" height="60" as="geometry" />
         </mxCell>
         <mxCell id="RNud2RT-OnFLoZX_OF3f-15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=-0.015;entryY=0.083;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="RNud2RT-OnFLoZX_OF3f-10" target="RNud2RT-OnFLoZX_OF3f-34" edge="1">
