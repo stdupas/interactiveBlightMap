@@ -1,6 +1,7 @@
-setwd("/Users/josedanielcardenasrincon/Documents/map.agromakers/R-space")
+setwd("/Users/josedanielcardenasrincon/Documents/Github/map.agromakers/R-space")
 library(raster)
 library(sp)
+library(chron)
 
 list0 <- list.files(path="./Data/maps/geoTIFFhumedadhorario0104202000Z", full.names=TRUE)
 list1 <- list.files(path="./Data/maps/geoTIFFtemphorario0104202000Z",full.names=TRUE)
@@ -11,13 +12,24 @@ y0 <- extract(imageRH,c(1:ncell(imageRH)))
 coord <- xyFromCell(imageRH,1:ncell(imageRH))
 cbd0 <- cbind(coord,y0)
 rh_df <- as.data.frame(cbd0)
-head(rh_df)
 
 y1 <- extract(imageTemp,c(1:ncell(imageTemp)))
 coord <- xyFromCell(imageTemp,1:ncell(imageTemp))
 cbd1 <- cbind(coord,y1)
 temp_df <- as.data.frame(cbd1)
-head(temp_df)
+
+df <- data.frame(matrix(ncol = 6, nrow = 0))
+x <- c("stationID", "x", "y", "time", "temperature", "relativeHumidity")
+colnames(df) <- x
+
+time <- chron(date="04/01/20", time="00:00:00")
+
+for (i in 1:100) {
+  for(j in (3:ncol(temp_df))){
+  df[nrow(df) + 1,] <- c(i, temp_df[i,1], temp_df[i,2], time, temp_df[i,j], rh_df[i,j] )
+  time=time+(1/24)
+  }
+}
 
 #count(ydf, vars = c("layer.1","layer.2","layer.3","layer.4"))
 #brk <- do.call(brick, lapply(list.files(path = "./Data/maps/geoTIFFhumedadhorario0104202000Z", pattern="RH*.*tif"), raster))
