@@ -31,6 +31,7 @@ resistance = "S"
 
 # Load libraries ---------------------------------------------------------------
 setwd("/Users/josedanielcardenasrincon/Documents/map.agromakers/R-space")
+# setwd("/home/dupas/map.agromakers/R-space/")
 library("readr")
 library("chron")
 library("raster")
@@ -42,8 +43,8 @@ blightR <- NULL
 
 # Run this function to generate blight unit calculations for the HUSWO data set
 DailyBlightUnitFiles <- function() {
-  list0 <- list.files(path="./Data/maps/geoTIFFhumedadhorario0104202000Z", full.names=TRUE)
-  list1 <- list.files(path="./Data/maps/geoTIFFtemphorario0104202000Z",full.names=TRUE)
+  list0 <- list.files(path="./Data/maps", "humedad", full.names=TRUE)
+  list1 <- list.files(path="./Data/maps", "temp", full.names=TRUE)
   imageRH <- stack(list0)
   imageTemp<-stack(list1)
   

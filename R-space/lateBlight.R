@@ -169,9 +169,14 @@ DayR <- function(weather_data, min_year, max_year) {
 
 ConsR <- function(tRH, tC) {
   # This outputs tcons and consmc as a list.
+  # - tcons is the number of hours of the periods of the day with 
+  # consecutive hours with humidity above 90%, 
+  # starting fom noon to noon the next day
+  # - consmc is the mean temperature for each periods
   # To get each assign out1 = ConsR(tRH, tC) then out1$tcons and out1$consmc
   # tRH  =  Temporary Relative Humidity
   # tC  =  Temporary *C
+
   consmc <- 0 * (1:12) - 99
   first <- TRUE
   tcons <- 0 * (1:12)
