@@ -191,17 +191,20 @@ DayR <- function(weather_data, min_year, max_year) {
 }
 
 
-ConsR <- function(tRH, tC) {
+ConsR <- function(RHtC) {
+  # tRHTC is a concathenated vector of RH from 1 pm to 12 am followed by tC from 1 pm to 12 am
   # This outputs tcons and consmc as a list.
   # To get each assign out1 = ConsR(tRH, tC) then out1$tcons and out1$consmc
   # tRH  =  Temporary Relative Humidity
   # tC  =  Temporary *C
-  consmc <- 0 * (1:12) - 99
+  tRH = RHtC[1:24]
+  tC = RHtC[25:48]
+  consmc <- c()
   first <- TRUE
-  tcons <- 0 * (1:12)
+  tcons <- 0
   cons_index <- 1
   tttemp <- (-99)
-  
+  tcons[[1]] = 0
   for (j in (1:24)) {
     if (tRH[j] >= 90) {
       tcons[cons_index] <- tcons[cons_index] + 1
@@ -217,16 +220,102 @@ ConsR <- function(tRH, tC) {
       if ((tRH[j + 1] < 90 & j < 24) | j  ==  24) {
         consmc[cons_index] <- mean(tttemp)
         cons_index <- cons_index + 1
+        tcons[cons_index] = 0
         tttemp <- (-99)
         first <- TRUE
       }
     }
   }
-  cons_out <- data.frame(tcons, consmc)
+  cons_out <- list(tcons=tcons, consmc=consmc)
   cons_out
 }
 
+blightUnitsTable <- read.csv("Data/BlightUnitsTable.csv",sep="\t")
+
+
 ## Blight Unit Calculation
+# resistance is a global variable
+
+blightR <- function(RHtC) {
+  consRt <- ConsR(RHtC)
+  blR = NULL
+  for (period in 1:length(consRt$consmc)){
+    blR = append(blR,blightUnitsTable[(blightUnitsTable$Res==resistance)&
+                                        (consRt$consmc[period]>blightUnitsTable$ConsmcMin)&
+                                        (consRt$consmc[period]<=blightUnitsTable$ConsmcMax)&
+                                        (consRt$tcons[period]==blightUnitsTable$tcons),
+                                      "BlightR"])
+  }
+  sum(blR)
+}
+
+# apply to maps
+
+# ejemplo de mapa (a stack of TRH folowed by TC)
+mapRHTC <- stack(
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)))
+
+
+getandplotBligthMap <- function(RHtCstack){
+  blightMap = RHtCstack[[1]]
+  values(blightMap)=unlist(lapply(1:dim(RHTCvalues)[1],FUN=function(i){blightR(RHTCvalues[i,])}))
+  plot(blightMap)
+  blightMap
+}
+
+result=getandplotBligthMap(mapRHTC)
+values(result)
+
+## old stuff
+
+
 blightR <- function(consmc, tcons, resistance) {
   blight_unit = 0 * (1:12)
   if (resistance == "S") {
