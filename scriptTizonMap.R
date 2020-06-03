@@ -4,12 +4,18 @@ setwd("/Users/josedanielcardenasrincon/Documents/Github/map.agromakers/R-space")
 library(raster)
 library(sp)
 library(chron)
+source("lateBlightMap.R")
 
 rastlist <- list.files(path = "./Data/maps/", all.files=TRUE, full.names=FALSE, patern='.tif$')
 list0 <- list.files(path="./Data/maps", "humedad", full.names=TRUE)
 list1 <- list.files(path="./Data/maps", "temp",full.names=TRUE)
 imageRH <- stack(list0)
 imageTemp<-stack(list1)
+RHtCstack
+getandplotBligthMap <- (imageRH,imageTemp,resistance)
+
+Period 
+
 
 #y0 <- extract(imageRH,c(1:ncell(imageRH)))
 #coord <- xyFromCell(imageRH,1:ncell(imageRH))
@@ -33,3 +39,60 @@ time <- chron(date="04/01/20", time="00:00:00")
 #  time=time+(1/24)
 #  }
 #}
+
+
+# ejemplo de mapa inventado (a stack of TRH folowed by TC)
+mapRHTC <- stack(
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
+  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)))
+
+
+result=getandplotBligthMap(mapRHTC)
+values(result)
+

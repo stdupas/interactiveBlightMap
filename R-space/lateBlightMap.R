@@ -30,12 +30,12 @@ resistance = "S"
 #resistance = "R"
 
 # Load libraries ---------------------------------------------------------------
-setwd("/Users/josedanielcardenasrincon/Documents/map.agromakers/R-space")
+# setwd("/Users/josedanielcardenasrincon/Documents/map.agromakers/R-space")
 # setwd("/home/dupas/map.agromakers/R-space/")
 library("readr")
 library("chron")
 library("raster")
-library("sp")
+#library("sp")
 
 ConsR <- NULL
 DayR <- NULL
@@ -191,14 +191,19 @@ DayR <- function(weather_data, min_year, max_year) {
 }
 
 
-ConsR <- function(RHtC) {
-  # tRHTC is a concathenated vector of RH from 1 pm to 12 am followed by tC from 1 pm to 12 am
+ConsR <- function(RH,tC) {
+  # argument : tRHTC is a concathenated vector of RH from 1 pm to 12 am 
+  # followed by tC from 1 pm to 12 am
+  # RH  =  Relative Humidity
+  # tC  =  temperature *C
+  # value : list, [[1]]=tcons and [[2]] consmc.
+  # - tcons is the number of hours of the periods of the day with 
+  # consecutive hours with humidity above 90%, 
+  # starting fom noon to noon the next day
+  # - consmc is the mean temperature for each periods
+  # Usage : To get each assign out1 = ConsR(c(tRH, tC)) then out1$tcons and out1$consmc
   # This outputs tcons and consmc as a list.
   # To get each assign out1 = ConsR(tRH, tC) then out1$tcons and out1$consmc
-  # tRH  =  Temporary Relative Humidity
-  # tC  =  Temporary *C
-  tRH = RHtC[1:24]
-  tC = RHtC[25:48]
   consmc <- c()
   first <- TRUE
   tcons <- 0
@@ -206,7 +211,7 @@ ConsR <- function(RHtC) {
   tttemp <- (-99)
   tcons[[1]] = 0
   for (j in (1:24)) {
-    if (tRH[j] >= 90) {
+    if (RH[j] >= 90) {
       tcons[cons_index] <- tcons[cons_index] + 1
       if (first) {
         tttemp <- tC[j]
@@ -217,7 +222,7 @@ ConsR <- function(RHtC) {
       }
       first <- FALSE
       
-      if ((tRH[j + 1] < 90 & j < 24) | j  ==  24) {
+      if ((RH[j + 1] < 90 & j < 24) | j  ==  24) {
         consmc[cons_index] <- mean(tttemp)
         cons_index <- cons_index + 1
         tcons[cons_index] = 0
@@ -230,20 +235,22 @@ ConsR <- function(RHtC) {
   cons_out
 }
 
-blightUnitsTable <- read.csv("Data/BlightUnitsTable.csv",sep="\t")
-
 
 ## Blight Unit Calculation
-# resistance is a global variable
 
-blightR <- function(RHtC) {
-  consRt <- ConsR(RHtC)
+blightUnitsTable <- read.csv("Data/BlightUnitsTable.csv",sep="\t")
+
+tRH=RHarray[i,]
+tC=tCarray[i,]
+resistance
+blightR <- function(RH,tC,resistance) {
+  tconsR <- ConsR(RH,tC)
   blR = NULL
-  for (period in 1:length(consRt$consmc)){
+  for (period in 1:length(tconsR$consmc)){
     blR = append(blR,blightUnitsTable[(blightUnitsTable$Res==resistance)&
-                                        (consRt$consmc[period]>blightUnitsTable$ConsmcMin)&
-                                        (consRt$consmc[period]<=blightUnitsTable$ConsmcMax)&
-                                        (consRt$tcons[period]==blightUnitsTable$tcons),
+                                        (tconsR$consmc[period]>blightUnitsTable$ConsmcMin)&
+                                        (tconsR$consmc[period]<=blightUnitsTable$ConsmcMax)&
+                                        (tconsR$tcons[period]==blightUnitsTable$tcons),
                                       "BlightR"])
   }
   sum(blR)
@@ -251,271 +258,54 @@ blightR <- function(RHtC) {
 
 # apply to maps
 
-# ejemplo de mapa (a stack of TRH folowed by TC)
-mapRHTC <- stack(
-  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 89.5,max = 93),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)),
-  raster(matrix (runif(n = 16,min = 7,max = 23),nrow = 4,ncol = 4)))
-
-
-getandplotBligthMap <- function(RHtCstack){
-  blightMap = RHtCstack[[1]]
-  values(blightMap)=unlist(lapply(1:dim(RHTCvalues)[1],FUN=function(i){blightR(RHTCvalues[i,])}))
+getandplotBligthMapFromRHTcStack <- function(RHstack,tCstack,resistance="MS"){
+  # Function to get and plot a raster format map from climate stacks and resistance level
+  # arguments : 
+  # RHstack = mean relative humidity per hour from 1pm to 12 am the next day
+  # tCstack = mean relative humidity per hour from 1pm to 12 am the next day
+  # resistance = resistance among "S" "MS" and "R" as defined in levels in the Grunwalds paper
+  blightMap = RHstack[[1]]
+  tCarray <- values(tCstack)
+  RHarray <- values(RHstack)
+  values(blightMap)=unlist(lapply(1:dim(RHarray)[1],FUN=function(i){blightR(tRH = RHarray[i,],tC = tCarray[i,],resistance = resistance)}))
   plot(blightMap)
   blightMap
 }
 
-result=getandplotBligthMap(mapRHTC)
-values(result)
-
-## old stuff
-
-
-blightR <- function(consmc, tcons, resistance) {
-  blight_unit = 0 * (1:12)
-  if (resistance == "S") {
-    for (k in (1:12)) {
-      if (consmc[k] <= 27 & consmc[k] >= 3) {
-        if (consmc[k] >= 23 & consmc[k] <= 27) {
-          if (tcons[k] >= 7 & tcons[k] <= 9) {
-            blight_unit[k] = 1
-          } else
-            if (tcons[k] >= 10 &
-                tcons[k] <= 12) {
-              blight_unit[k] = 2
-            } else
-              if (tcons[k] >= 13 &
-                  tcons[k] <= 15) {
-                blight_unit[k] = 3
-              } else
-                if (tcons[k] >= 19 &
-                    tcons[k] <= 24) {
-                  blight_unit[k] = 5
-                }
-        }
-        if (consmc[k] >= 13 & consmc[k] <= 22) {
-          if (tcons[k] >= 7 & tcons[k] <= 9) {
-            blight_unit[k] = 5
-          } else
-            if (tcons[k] >= 10 &
-                tcons[k] <= 12) {
-              blight_unit[k] = 6
-            } else
-              if (tcons[k] >= 13 &
-                  tcons[k] <= 24) {
-                blight_unit[k] = 7
-              }
-        }
-        
-        if (consmc[k] >= 8 & consmc[k] <= 12) {
-          if (tcons[k] == 7) {
-            blight_unit[k] = 1
-          } else
-            if (tcons[k] >= 8 &
-                tcons[k] <= 9) {
-              blight_unit[k] = 2
-            } else
-              if (tcons[k] == 10) {
-                blight_unit[k] = 3
-              } else
-                if (tcons[k] >= 11 &
-                    tcons[k] <= 12) {
-                  blight_unit[k] = 4
-                } else
-                  if (tcons[k] >= 13 &
-                      tcons[k] <= 15) {
-                    blight_unit[k] = 5
-                  } else
-                    if (tcons[k] >= 16 &
-                        tcons[k] <= 24) {
-                      blight_unit[k] = 6
-                    }
-        }
-        
-        if (consmc[k] >= 3 & consmc[k] <= 7) {
-          if (tcons[k] >= 10 & tcons[k] <= 12) {
-            blight_unit[k] = 1
-          } else
-            if (tcons[k] >= 13 &
-                tcons[k] <= 15) {
-              blight_unit[k] = 2
-            } else
-              if (tcons[k] >= 16 &
-                  tcons[k] <= 18) {
-                blight_unit[k] = 3
-              } else
-                if (tcons[k] >= 19 &
-                    tcons[k] <= 24) {
-                  blight_unit[k] = 4
-                }
-        }
-      }
+getandplotBlightRMapFromDownloadedDate <- function(Date=Sys.Date(), resistance="MS"){
+  # The three resistance levels in the Grunwalds paper are "S" "MS" and "R"
+  URL <- "http://bart.ideam.gov.co/wrfideam/new_modelo/WRF00COLOMBIA/tif/"
+  repeat{
+    filetC = paste("geoTIFFtemphorario",as.character(format(Date, "%d%m%Y")),"00Z.zip",sep="")
+    fileRH = paste("geoTIFFhumedadhorario",as.character(format(Date, "%d%m%Y")),"00Z.zip",sep="")
+    filetCdaybef = paste("geoTIFFtemphorario",as.character(format(Date-1, "%d%m%Y")),"00Z.zip",sep="")
+    fileRHdaybef = paste("geoTIFFhumedadhorario",as.character(format(Date-1, "%d%m%Y")),"00Z.zip",sep="")
+    if (file.exists(paste("./Data/maps/",filetC,sep=""))&file.exists(paste("./Data/maps/",fileRH,sep=""))&file.exists(paste("./Data/maps/",filetCdaybef,sep=""))&file.exists(paste("./Data/maps/",fileRHdaybef,sep=""))) break
+    if (HEAD(paste(URL,filetC,sep=""))$status==500&HEAD(paste(URL,fileRH,sep=""))$status==500&HEAD(paste(URL,filetCdaybef,sep=""))$status==500&HEAD(paste(URL,fileRHdaybef,sep=""))$status==500) {
+      if (!(file.exists(paste("./Data/maps/",filetC,sep="")))) download.file(paste(URL,filetC,sep=""), destfile = paste("./Data/maps/",filetC,sep=""), method="auto")
+      if (!(file.exists(paste("./Data/maps/",fileRH,sep="")))) download.file(paste(URL,fileRH,sep=""), destfile = paste("./Data/maps/",fileRH,sep=""), method="auto")
+      if (!(file.exists(paste("./Data/maps/",filetCdaybef,sep="")))) download.file(paste(URL,filetCdaybef,sep=""), destfile = paste("./Data/maps/",filetCdaybef,sep=""), method="auto")
+      if (!(file.exists(paste("./Data/maps/",fileRHdaybef,sep="")))) download.file(paste(URL,fileRHdaybef,sep=""), destfile = paste("./Data/maps/",fileRHdaybef,sep=""), method="auto")
+      break 
     }
-    
+    warning(paste("couldn't download RH and mean T for ",Date," and ",Date-1,", trying ",Date-1," and ",Date-2," instead...",sep="") )
+    Date=Date-1
   }
-  
-  if (resistance  ==  "MS") {
-    for (k in (1:12)) {
-      if (consmc[k] <= 27 & consmc[k] >= 3) {
-        if (consmc[k] >= 23 & consmc[k] <= 27) {
-          if (tcons[k] >= 10 & tcons[k] <= 18) {
-            blight_unit[k] = 1
-          } else
-            if (tcons[k] >= 19 &
-                tcons[k] <= 24) {
-              blight_unit[k] = 2
-            }
-        }
-        
-        if (consmc[k] >= 13 & consmc[k] <= 22) {
-          if (tcons[k] == 7) {
-            blight_unit[k] = 1
-          } else
-            if (tcons[k] == 8) {
-              blight_unit[k] = 2
-            } else
-              if (tcons[k] == 9) {
-                blight_unit[k] = 3
-              } else
-                if (tcons[k] == 10) {
-                  blight_unit[k] = 4
-                } else
-                  if (tcons[k] >= 11 &
-                      tcons[k] <= 12) {
-                    blight_unit[k] = 5
-                  } else
-                    if (tcons[k] >= 13 &
-                        tcons[k] <= 24) {
-                      blight_unit[k] = 6
-                    }
-        }
-        
-        if (consmc[k] >= 8 & consmc[k] <= 12) {
-          if (tcons[k] >= 7 & tcons[k] <= 9) {
-            blight_unit[k] = 1
-          } else
-            if (tcons[k] >= 10 &
-                tcons[k] <= 12) {
-              blight_unit[k] = 2
-            } else
-              if (tcons[k] == 13 &
-                  tcons[k] <= 15) {
-                blight_unit[k] = 3
-              } else
-                if (tcons[k] >= 16 &
-                    tcons[k] <= 18) {
-                  blight_unit[k] = 4
-                } else
-                  if (tcons[k] >= 19 &
-                      tcons[k] <= 24) {
-                    blight_unit[k] = 5
-                  }
-        }
-        
-        if (consmc[k] >= 3 & consmc[k] <= 7) {
-          if (tcons[k] >= 13 & tcons[k] <= 24) {
-            blight_unit[k] = 1
-          }
-        }
-      }
-    }
-  } else if (resistance  ==  "R") {
-    for (k in (1:12)) {
-      if (consmc[k] <= 27 & consmc[k] >= 3) {
-        if (consmc[k] >= 23 & consmc[k] <= 27) {
-          if (tcons[k] >= 14 & tcons[k] <= 16) {
-            blight_unit[k] = 1
-          }
-        }
-        
-        if (consmc[k] >= 13 & consmc[k] <= 22) {
-          if (tcons[k] == 7) {
-            blight_unit[k] = 1
-          } else
-            if (tcons[k] == 8) {
-              blight_unit[k] = 2
-            } else
-              if (tcons[k] == 9) {
-                blight_unit[k] = 3
-              } else
-                if (tcons[k] >= 10 &
-                    tcons[k] <= 12) {
-                  blight_unit[k] = 4
-                } else
-                  if (tcons[k] >= 13 &
-                      tcons[k] <= 24) {
-                    blight_unit[k] = 5
-                  }
-        }
-        
-        if (consmc[k] >= 8 & consmc[k] <= 12) {
-          if (tcons[k] >= 10 & tcons[k] <= 12) {
-            blight_unit[k] = 1
-          } else
-            if (tcons[k] >= 13 &
-                tcons[k] <= 15) {
-              blight_unit[k] = 2
-            } else
-              if (tcons[k] >= 16 &
-                  tcons[k] <= 24) {
-                blight_unit[k] = 3
-              }
-        }
-        
-        if (consmc[k] >= 3 & consmc[k] <= 7) {
-          if (tcons[k] >= 19 & tcons[k] <= 24) {
-            blight_unit[k] = 1
-          }
-        }
-      }
-    }
-  }
-  return(blight_unit)
+  filesToExtractTempDayBefore <- paste("TEMP1H_",rep(as.character(format(Date-1, "%d%m%Y")),11),"_fcst_DIA1",13:23,"HLC.tif",sep="")
+  unzip(zipfile = paste("./Data/maps/",filetCdaybef,sep=""),files = filesToExtractTempDayBefore, exdir = "./Data/maps/")
+  filesToExtractTempCurrentDay <- paste("TEMP1H_",rep(as.character(format(Date, "%d%m%Y")),11),"_fcst_DIA1",c("00","01","02","03","04","05","06","07","08","09","10","11","12"),"HLC.tif",sep="")
+  unzip(zipfile = paste("./Data/maps/",filetC,sep=""),files = filesToExtractTempCurrentDayRH, exdir = "./Data/maps/")
+  filesToExtractRHDayBefore <- paste("RH1H_",rep(as.character(format(Date-1, "%d%m%Y")),11),"_fcst_DIA1",13:23,"HLC.tif",sep="")
+  unzip(zipfile = paste("./Data/maps/",fileRHdaybef,sep=""),files = filesToExtractRHDayBefore, exdir = "./Data/maps/")
+  filesToExtractRHCurrentDay <- paste("RH1H_",rep(as.character(format(Date, "%d%m%Y")),11),"_fcst_DIA1",c("00","01","02","03","04","05","06","07","08","09","10","11","12"),"HLC.tif",sep="")
+  unzip(zipfile = paste("./Data/maps/",fileRH,sep=""),files = filesToExtractRHCurrentDay, exdir = "./Data/maps/")
+
+  tCstack <- stack(paste("./Data/maps/",files=c(filesToExtractTempDayBefore,filesToExtractTempCurrentDay),sep=""))
+  RHstack <- stack(paste("./Data/maps/",files=c(filesToExtractRHDayBefore,filesToExtractRHCurrentDay),sep=""))
+  blightMap = RHstack[[1]]
+  tCarray <- values(tCstack)
+  RHarray <- values(RHstack)
+  values(blightMap)=unlist(lapply(1:ncell(RHstack)[1],FUN=function(i){blightR(tRH = RHarray[i,],tC = tCarray[i,],resistance = resistance)}))
+  plot(blightMap)
+  blightMap
 }
-
-# eos
