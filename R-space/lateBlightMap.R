@@ -30,8 +30,7 @@ resistance = "S"
 #resistance = "R"
 
 # Load libraries ---------------------------------------------------------------
-setwd("/Users/josedanielcardenasrincon/Desktop/map.agromakers/R-space")
-# setwd("/home/dupas/map.agromakers/R-space/")
+
 library("readr")
 library("chron")
 library("raster")
@@ -274,7 +273,7 @@ getandplotBligthMapFromRHTcStack <- function(RHstack,tCstack,resistance="MS"){
   blightMap
 }
 
-getandplotBlightRMapFromDownloadedDate <- function(Date=Sys.Date(), resistance="MS"){
+blightRMapFromDownloadedDate <- function(Date=Sys.Date(), resistance="MS",removeClimateData=FALSE){
   # The three resistance levels in the Grunwalds paper are "S" "MS" and "R"
   URL <- "http://bart.ideam.gov.co/wrfideam/new_modelo/WRF00COLOMBIA/tif/"
   repeat{
@@ -301,15 +300,23 @@ getandplotBlightRMapFromDownloadedDate <- function(Date=Sys.Date(), resistance="
   unzip(zipfile = paste("./Data/maps/",fileRHdaybef,sep=""),files = filesToExtractRHDayBefore, exdir = "./Data/maps/")
   filesToExtractRHCurrentDay <- paste("RH1H_",rep(as.character(format(Date, "%d%m%Y")),11),"_fcst_DIA1",c("00","01","02","03","04","05","06","07","08","09","10","11","12"),"HLC.tif",sep="")
   unzip(zipfile = paste("./Data/maps/",fileRH,sep=""),files = filesToExtractRHCurrentDay, exdir = "./Data/maps/")
-
   tCstack <- stack(paste("./Data/maps/",files=c(filesToExtractTempDayBefore,filesToExtractTempCurrentDay),sep=""))
   RHstack <- stack(paste("./Data/maps/",files=c(filesToExtractRHDayBefore,filesToExtractRHCurrentDay),sep=""))
   blightMap = RHstack[[1]]
   tCarray <- values(tCstack)
   RHarray <- values(RHstack)
   values(blightMap)=unlist(lapply(1:ncell(RHstack)[1],FUN=function(i){blightR(RH = RHarray[i,],tC = tCarray[i,],resistance = resistance)}))
-  plot(blightMap)
+  if (removeClimateData) {
+    file.remove(paste("./Data/maps/",files=c(filesToExtractTempDayBefore,filesToExtractTempCurrentDay),sep=""))
+    file.remove(paste("./Data/maps/",files=c(filesToExtractRHDayBefore,filesToExtractRHCurrentDay),sep=""))
+  }
   blightMap
+}
+
+plotBlightMap <- function(blightMap){
+  plot(blightMap)
+  Colombia = readOGR(dsn = "Data/maps/",layer = "COL_adm0")
+  plot(Colombia,add=TRUE)
 }
 
 # Define UI for application that draws a map
@@ -332,7 +339,7 @@ ui <- fluidPage(
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
-  adm <- getandplotBlightRMapFromDownloadedDate()
+  adm <- blightRMapFromDownloadedDate()
   mar<-(adm)
   output$map <- renderPlot({
     plot(mar)
@@ -340,6 +347,3 @@ server <- function(input, output) {
   output$value <- renderPrint( {extract(adm, cbind(x=input$caption1, y=input$caption2))} )
 }
 
-# Hay que descomentar la linea de abajo para que se pueda inicializar Shinny como aplicación web
-# y comentarla para la vista de script
-shinyApp(ui = ui, server = server)
