@@ -30,12 +30,14 @@ resistance = "S"
 #resistance = "R"
 
 # Load libraries ---------------------------------------------------------------
-# setwd("/Users/josedanielcardenasrincon/Documents/map.agromakers/R-space")
+setwd("/Users/josedanielcardenasrincon/Desktop/map.agromakers/R-space")
 # setwd("/home/dupas/map.agromakers/R-space/")
 library("readr")
 library("chron")
 library("raster")
-#library("sp")
+library("httr")
+library("shiny")
+library("sp")
 
 ConsR <- NULL
 DayR <- NULL
@@ -240,9 +242,9 @@ ConsR <- function(RH,tC) {
 
 blightUnitsTable <- read.csv("Data/BlightUnitsTable.csv",sep="\t")
 
-tRH=RHarray[i,]
-tC=tCarray[i,]
-resistance
+#tRH=RHarray[i,]
+#tC=tCarray[i,]
+#resistance
 blightR <- function(RH,tC,resistance) {
   tconsR <- ConsR(RH,tC)
   blR = NULL
@@ -294,7 +296,7 @@ getandplotBlightRMapFromDownloadedDate <- function(Date=Sys.Date(), resistance="
   filesToExtractTempDayBefore <- paste("TEMP1H_",rep(as.character(format(Date-1, "%d%m%Y")),11),"_fcst_DIA1",13:23,"HLC.tif",sep="")
   unzip(zipfile = paste("./Data/maps/",filetCdaybef,sep=""),files = filesToExtractTempDayBefore, exdir = "./Data/maps/")
   filesToExtractTempCurrentDay <- paste("TEMP1H_",rep(as.character(format(Date, "%d%m%Y")),11),"_fcst_DIA1",c("00","01","02","03","04","05","06","07","08","09","10","11","12"),"HLC.tif",sep="")
-  unzip(zipfile = paste("./Data/maps/",filetC,sep=""),files = filesToExtractTempCurrentDayRH, exdir = "./Data/maps/")
+  unzip(zipfile = paste("./Data/maps/",filetC,sep=""),files = filesToExtractTempCurrentDay, exdir = "./Data/maps/")
   filesToExtractRHDayBefore <- paste("RH1H_",rep(as.character(format(Date-1, "%d%m%Y")),11),"_fcst_DIA1",13:23,"HLC.tif",sep="")
   unzip(zipfile = paste("./Data/maps/",fileRHdaybef,sep=""),files = filesToExtractRHDayBefore, exdir = "./Data/maps/")
   filesToExtractRHCurrentDay <- paste("RH1H_",rep(as.character(format(Date, "%d%m%Y")),11),"_fcst_DIA1",c("00","01","02","03","04","05","06","07","08","09","10","11","12"),"HLC.tif",sep="")
@@ -305,7 +307,39 @@ getandplotBlightRMapFromDownloadedDate <- function(Date=Sys.Date(), resistance="
   blightMap = RHstack[[1]]
   tCarray <- values(tCstack)
   RHarray <- values(RHstack)
-  values(blightMap)=unlist(lapply(1:ncell(RHstack)[1],FUN=function(i){blightR(tRH = RHarray[i,],tC = tCarray[i,],resistance = resistance)}))
+  values(blightMap)=unlist(lapply(1:ncell(RHstack)[1],FUN=function(i){blightR(RH = RHarray[i,],tC = tCarray[i,],resistance = resistance)}))
   plot(blightMap)
   blightMap
 }
+
+# Define UI for application that draws a map
+ui <- fluidPage(
+  # App title ----
+  titlePanel("Agromakers - Información sobre riesgo del tizón tardio para hoy"),
+  # Sidebar layout with a input and output definitions ----
+  sidebarLayout(
+    # Sidebar panel for inputs ----
+    sidebarPanel(
+      numericInput("caption1", "Coordenada X", -75),
+      numericInput("caption2", "Coordenada Y", 0),
+      verbatimTextOutput("value")
+    ),
+    # Main panel for displaying outputs ----
+    mainPanel(mainPanel(fluid = TRUE, plotOutput('map'))
+    )
+  )
+)
+
+# Define server logic required to draw a histogram
+server <- function(input, output) {
+  adm <- getandplotBlightRMapFromDownloadedDate()
+  mar<-(adm)
+  output$map <- renderPlot({
+    plot(mar)
+  })
+  output$value <- renderPrint( {extract(adm, cbind(x=input$caption1, y=input$caption2))} )
+}
+
+# Hay que descomentar la linea de abajo para que se pueda inicializar Shinny como aplicación web
+# y comentarla para la vista de script
+shinyApp(ui = ui, server = server)
