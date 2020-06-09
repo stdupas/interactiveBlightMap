@@ -31,11 +31,13 @@ resistance = "S"
 
 # Load libraries ---------------------------------------------------------------
 
-library("readr")
-#library("chron")
-library("raster")
-library("httr")
-#library("sp")
+library(readr)
+#library(chron)
+library(raster)
+library(httr)
+library(shiny)
+library(rgdal)
+
 
 ConsR <- NULL
 DayR <- NULL
@@ -314,6 +316,37 @@ blightRMapFromDownloadedDate <- function(Date=Sys.Date(), resistance="MS",remove
 
 plotBlightMap <- function(blightMap){
   plot(blightMap)
-  Colombia = readOGR(dsn = "Data/maps/",layer = "COL_adm0")
+  Colombia = readOGR(dsn = "Data/maps/",layer = "country")
   plot(Colombia,add=TRUE)
+}
+
+# Define UI for application that draws a map
+ui <- fluidPage(
+  # App title ----
+  titlePanel("Agromakers - Información sobre riesgo del tizón tardio para hoy"),
+  # Sidebar layout with a input and output definitions ----
+  sidebarLayout(
+    # Sidebar panel for inputs ----
+    sidebarPanel(
+      numericInput("caption1", "Coordenada X", -75),
+      numericInput("caption2", "Coordenada Y", 0),
+      selectInput("severidad", "Seleccionar severidad",
+                  c("Severa" = "S",
+                    "Regular" = "R",
+                    "Moderada" = "MS")),
+      verbatimTextOutput("value")
+    ),
+    # Main panel for displaying outputs ----
+    mainPanel(mainPanel(fluid = TRUE, plotOutput('map'))
+    )
+  )
+)
+
+
+# Define server logic required to draw a histogram
+server <- function(input, output) {
+  output$map <- renderPlot({
+    plotBlightMap(blightRMapFromDownloadedDate(resistance=input$severidad))
+  })
+  output$value <- renderPrint( {extract(blight(input$severidad), cbind(x=input$caption1, y=input$caption2))} )
 }
