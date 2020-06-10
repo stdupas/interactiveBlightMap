@@ -302,6 +302,7 @@ blightRMapFromDownloadedDate <- function(Date=Sys.Date(), resistance="MS",remove
     warning(paste("couldn't get RH and mean T for ",Date," and ",Date-1,", trying ",Date-1," and ",Date-2," instead...",sep="") )
     Date=Date-1
   }
+  
   TempFiles = paste("./Data/maps/",c(paste("TEMP1H_",rep(as.character(format(Date-1, "%d%m%Y")),11),"_fcst_DIA1",13:23,"HLC.tif",sep=""),
                                      paste("TEMP1H_",rep(as.character(format(Date, "%d%m%Y")),11),"_fcst_DIA1",c("00","01","02","03","04","05","06","07","08","09","10","11","12"),"HLC.tif",sep="")),
                     sep="")
@@ -321,6 +322,73 @@ blightRMapFromDownloadedDate <- function(Date=Sys.Date(), resistance="MS",remove
   blightMap
 }
 
+blightRMapListFOr7daysSinceDate <- function(Date=Sys.Date(), removeClimateData=FALSE){
+  # Returns list of tison prediction maps from Date to Date + 6 
+  # The three resistance levels in the Grunwalds paper are "S" "MS" and "R"
+  URL <- "http://bart.ideam.gov.co/wrfideam/new_modelo/WRF00COLOMBIA/tif/"
+  
+  files = lapply(c(TEMP="TEMP1H_",RH="RH1H_"),function(x){
+    list(Day1 =c(paste(x,rep(as.character(format(Date-1, "%d%m%Y")),11),"_fcst_DIA1",13:23,"HLC.tif",sep=""),
+                 paste(x,rep(as.character(format(Date, "%d%m%Y")),11),"_fcst_DIA1",c("00","01","02","03","04","05","06","07","08","09","10","11","12"),"HLC.tif",sep="")),
+         Day2 =c(paste(x,rep(as.character(format(Date, "%d%m%Y")),11),"_fcst_DIA1",13:23,"HLC.tif",sep=""),
+                 paste(x,rep(as.character(format(Date, "%d%m%Y")),11),"_fcst_DIA2",c("00","01","02","03","04","05","06","07","08","09","10","11","12"),"HLC.tif",sep="")),
+         Day3 =c(paste(x,rep(as.character(format(Date, "%d%m%Y")),11),"_fcst_DIA2",13:23,"HLC.tif",sep=""),
+                 paste(x,rep(as.character(format(Date, "%d%m%Y")),11),"_fcst_DIA3",c("00","01","02","03","04","05","06","07","08","09","10","11","12"),"HLC.tif",sep="")),
+         Day4 =c(paste(x,rep(as.character(format(Date, "%d%m%Y")),11),"_fcst_DIA3",13:23,"HLC.tif",sep=""),
+                 paste(x,rep(as.character(format(Date, "%d%m%Y")),11),"_fcst_DIA4",c("00","01","02","03","04","05","06","07","08","09","10","11","12"),"HLC.tif",sep="")),
+         Day5 =c(paste(x,rep(as.character(format(Date, "%d%m%Y")),11),"_fcst_DIA4",13:23,"HLC.tif",sep=""),
+                 paste(x,rep(as.character(format(Date, "%d%m%Y")),11),"_fcst_DIA5",c("00","01","02","03","04","05","06","07","08","09","10","11","12"),"HLC.tif",sep="")),
+         Day6 =c(paste(x,rep(as.character(format(Date, "%d%m%Y")),11),"_fcst_DIA5",13:23,"HLC.tif",sep=""),
+                 paste(x,rep(as.character(format(Date, "%d%m%Y")),11),"_fcst_DIA6",c("00","01","02","03","04","05","06","07","08","09","10","11","12"),"HLC.tif",sep="")),
+         Day7 =c(paste(x,rep(as.character(format(Date, "%d%m%Y")),11),"_fcst_DIA6",13:23,"HLC.tif",sep=""),
+                 paste(x,rep(as.character(format(Date, "%d%m%Y")),11),"_fcst_DIA7",c("00","01","02","03","04","05","06","07","08","09","10","11","12"),"HLC.tif",sep="")))})
+  fileInDir = lapply (files,function(x) lapply(x,function(y) paste("./Data/maps/",y,sep="")) )
+  zipfile = list(TempDayBefore = paste("geoTIFFtemphorario",as.character(format(Date-1, "%d%m%Y")),"00Z.zip",sep=""),
+                 TempCurrentDay = paste("geoTIFFtemphorario",as.character(format(Date, "%d%m%Y")),"00Z.zip",sep=""),
+                 RHDayBefore = paste("geoTIFFhumedadhorario",as.character(format(Date-1, "%d%m%Y")),"00Z.zip",sep=""),
+                 RHCurrentDay = paste("geoTIFFhumedadhorario",as.character(format(Date, "%d%m%Y")),"00Z.zip",sep=""))
+  zipfileInURL = lapply (zipfile, function(x) paste(URL,x,sep="") )
+  zipfileInDir = lapply (zipfile, function(x) paste("./Data/maps/",x,sep="") )
+  if (!all(file.exists(unlist(fileInDir)))) {
+    for (typeOfData in c("TempDayBefore","TempCurrentDay","RHDayBefore","RHCurrentDay")){      
+      if (!file.exists(zipfileInDir[[typeOfData]])) repeat {
+        if (try(download.file(url = zipfileInURL[[typeOfData]], destfile = zipfileInDir[[typeOfData]], method="auto"))==0) break
+      }
+    }
+    unzip(zipfile = zipfileInDir[["TempDayBefore"]],files = files[["TEMP"]][["Day1"]][1:11],exdir = "./Data/maps/")
+    unzip(zipfile = zipfileInDir[["RHDayBefore"]],files = files[["RH"]][["Day1"]][1:11],exdir = "./Data/maps/")
+    unzip(zipfile = zipfileInDir[["TempCurrentDay"]],exdir = "./Data/maps/")
+    unzip(zipfile = zipfileInDir[["RHCurrentDay"]],exdir = "./Data/maps/")
+  }
+  file.rename(
+    from=paste("./Data/maps/",unlist(lapply(c(TEMP="TEMP1H_",RH="RH1H_"),function(x){c(paste(x,rep(as.character(format(Date-1, "%d%m%Y")),11),"_fcst_DIA1",13:23,"HLC.tif",sep=""))})),sep=""),
+    to=paste("./Data/maps/",unlist(lapply(c(TEMP="TEMP1H_",RH="RH1H_"),function(x){c(paste(x,rep(as.character(format(Date, "%d%m%Y")),11),"_fcst_DIA0",13:23,"HLC.tif",sep=""))})),sep=""))
+  #warning(paste("couldn't get RH and mean T for ",Date," and ",Date-1,", trying ",Date-1," and ",Date-2," instead...",sep="") )
+  #Date=Date-1
+  blightMaps <- list()
+  for (resistance in (c("S","MS","R"))){
+    blightMaps[[resistance]]=list()
+    for (Day in 1:7){
+      TempFiles = paste("./Data/maps/",c(paste("TEMP1H_",rep(as.character(format(Date, "%d%m%Y")),11),"_fcst_DIA",(Day-1),13:23,"HLC.tif",sep=""),
+                                         paste("TEMP1H_",rep(as.character(format(Date, "%d%m%Y")),11),"_fcst_DIA",(Day),c("00","01","02","03","04","05","06","07","08","09","10","11","12"),"HLC.tif",sep="")),sep="")
+      RHFiles = paste("./Data/maps/",c(paste("RH1H_",rep(as.character(format(Date, "%d%m%Y")),11),"_fcst_DIA",(Day-1),13:23,"HLC.tif",sep=""),
+                                       paste("RH1H_",rep(as.character(format(Date, "%d%m%Y")),11),"_fcst_DIA",(Day),c("00","01","02","03","04","05","06","07","08","09","10","11","12"),"HLC.tif",sep="")),sep="")
+      tCstack <- stack(TempFiles)
+      RHstack <- stack(RHFiles)
+      blightMaps[[resistance]][[Day]] = RHstack[[1]]
+      tCarray <- values(tCstack)
+      RHarray <- values(RHstack)
+      values(blightMaps[[resistance]][[Day]])=unlist(lapply(1:ncell(RHstack)[1],FUN=function(i){blightR(RH = RHarray[i,],tC = tCarray[i,],resistance = resistance)}))
+    }
+    if (removeClimateData) {
+      file.remove(paste("./Data/maps/",files=c(filesToExtractTempDayBefore,filesToExtractTempCurrentDay),sep=""))
+      file.remove(paste("./Data/maps/",files=c(filesToExtractRHDayBefore,filesToExtractRHCurrentDay),sep=""))
+    }
+  }
+  blightMaps
+}
+
+
 plotBlightMap <- function(blightMap, coords){
   plot(blightMap)
   point=SpatialPoints(coords, proj4string=CRS(as.character(NA)))
@@ -328,8 +396,6 @@ plotBlightMap <- function(blightMap, coords){
   Colombia = readOGR(dsn = "Data/maps/",layer = "country")
   plot(Colombia,add=TRUE)
 }
-<<<<<<< HEAD
-=======
 
 bligthMapS <- blightRMapFromDownloadedDate(resistance="S")
 bligthMapR <- blightRMapFromDownloadedDate(resistance="R")
@@ -340,4 +406,3 @@ getBlight <- function(resistance){
   else if(resistance =="R") bligthMapR
   else if(resistance =="MS") bligthMapMS
 }
->>>>>>> 0962f360891eb07fda71f645eb17d8f2b2605a7b
