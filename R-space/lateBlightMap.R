@@ -35,7 +35,6 @@ library(readr)
 #library(chron)
 library(raster)
 library(httr)
-library(shiny)
 library(rgdal)
 
 
@@ -50,17 +49,17 @@ DailyBlightUnitFiles <- function() {
   imageRH <- stack(list0)
   imageTemp<-stack(list1)
   
-  y0 <- extract(imageRH,c(1:ncell(imageRH)))
-  coord <- xyFromCell(imageRH,1:ncell(imageRH))
-  cbd0 <- cbind(coord,y0)
-  rh_df <- as.data.frame(cbd0)
-  head(rh_df)
+  #y0 <- extract(imageRH,c(1:ncell(imageRH)))
+  #coord <- xyFromCell(imageRH,1:ncell(imageRH))
+  #cbd0 <- cbind(coord,y0)
+  #rh_df <- as.data.frame(cbd0)
+  #head(rh_df)
   
-  y1 <- extract(imageTemp,c(1:ncell(imageTemp)))
-  coord <- xyFromCell(imageTemp,1:ncell(imageTemp))
-  cbd1 <- cbind(coord,y1)
-  temp_df <- as.data.frame(cbd1)
-  head(temp_df)
+  #y1 <- extract(imageTemp,c(1:ncell(imageTemp)))
+  #coord <- xyFromCell(imageTemp,1:ncell(imageTemp))
+  #cbd1 <- cbind(coord,y1)
+  #temp_df <- as.data.frame(cbd1)
+  #head(temp_df)
   
   files <- list.files("Data", pattern = ".csv$", full.names =  TRUE)
   for (i in files) {
@@ -318,35 +317,4 @@ plotBlightMap <- function(blightMap){
   plot(blightMap)
   Colombia = readOGR(dsn = "Data/maps/",layer = "country")
   plot(Colombia,add=TRUE)
-}
-
-# Define UI for application that draws a map
-ui <- fluidPage(
-  # App title ----
-  titlePanel("Agromakers - Información sobre riesgo del tizón tardio para hoy"),
-  # Sidebar layout with a input and output definitions ----
-  sidebarLayout(
-    # Sidebar panel for inputs ----
-    sidebarPanel(
-      numericInput("caption1", "Coordenada X", -75),
-      numericInput("caption2", "Coordenada Y", 0),
-      selectInput("severidad", "Seleccionar severidad",
-                  c("Severa" = "S",
-                    "Regular" = "R",
-                    "Moderada" = "MS")),
-      verbatimTextOutput("value")
-    ),
-    # Main panel for displaying outputs ----
-    mainPanel(mainPanel(fluid = TRUE, plotOutput('map'))
-    )
-  )
-)
-
-
-# Define server logic required to draw a histogram
-server <- function(input, output) {
-  output$map <- renderPlot({
-    plotBlightMap(blightRMapFromDownloadedDate(resistance=input$severidad))
-  })
-  output$value <- renderPrint( {extract(blight(input$severidad), cbind(x=input$caption1, y=input$caption2))} )
 }
