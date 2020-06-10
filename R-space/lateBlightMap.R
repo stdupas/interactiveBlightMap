@@ -328,8 +328,6 @@ plotBlightMap <- function(blightMap, coords){
   Colombia = readOGR(dsn = "Data/maps/",layer = "country")
   plot(Colombia,add=TRUE)
 }
-<<<<<<< HEAD
-=======
 
 bligthMapS <- blightRMapFromDownloadedDate(resistance="S")
 bligthMapR <- blightRMapFromDownloadedDate(resistance="R")
@@ -340,4 +338,3 @@ getBlight <- function(resistance){
   else if(resistance =="R") bligthMapR
   else if(resistance =="MS") bligthMapMS
 }
->>>>>>> 0962f360891eb07fda71f645eb17d8f2b2605a7b
