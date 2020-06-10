@@ -36,6 +36,7 @@ library(readr)
 library(raster)
 library(httr)
 library(rgdal)
+library(sp)
 
 
 ConsR <- NULL
@@ -313,8 +314,20 @@ blightRMapFromDownloadedDate <- function(Date=Sys.Date(), resistance="MS",remove
   blightMap
 }
 
-plotBlightMap <- function(blightMap){
+plotBlightMap <- function(blightMap, coords){
   plot(blightMap)
+  point=SpatialPoints(coords, proj4string=CRS(as.character(NA)))
+  plot(point,add=TRUE)
   Colombia = readOGR(dsn = "Data/maps/",layer = "country")
   plot(Colombia,add=TRUE)
+}
+
+bligthMapS <- blightRMapFromDownloadedDate(resistance="S")
+bligthMapR <- blightRMapFromDownloadedDate(resistance="R")
+bligthMapMS <- blightRMapFromDownloadedDate(resistance="MS")
+
+getBlight <- function(resistance){
+  if(resistance =="S") bligthMapS
+  else if(resistance =="R") bligthMapR
+  else if(resistance =="MS") bligthMapMS
 }
