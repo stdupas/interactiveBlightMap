@@ -277,32 +277,39 @@ getandplotBligthMapFromRHTcStack <- function(RHstack,tCstack,resistance="MS"){
 blightRMapFromDownloadedDate <- function(Date=Sys.Date(), resistance="MS",removeClimateData=FALSE){
   # The three resistance levels in the Grunwalds paper are "S" "MS" and "R"
   URL <- "http://bart.ideam.gov.co/wrfideam/new_modelo/WRF00COLOMBIA/tif/"
+  
   repeat{
-    filetC = paste("geoTIFFtemphorario",as.character(format(Date, "%d%m%Y")),"00Z.zip",sep="")
-    fileRH = paste("geoTIFFhumedadhorario",as.character(format(Date, "%d%m%Y")),"00Z.zip",sep="")
-    filetCdaybef = paste("geoTIFFtemphorario",as.character(format(Date-1, "%d%m%Y")),"00Z.zip",sep="")
-    fileRHdaybef = paste("geoTIFFhumedadhorario",as.character(format(Date-1, "%d%m%Y")),"00Z.zip",sep="")
-    if (file.exists(paste("./Data/maps/",filetC,sep=""))&file.exists(paste("./Data/maps/",fileRH,sep=""))&file.exists(paste("./Data/maps/",filetCdaybef,sep=""))&file.exists(paste("./Data/maps/",fileRHdaybef,sep=""))) break
-    if (HEAD(paste(URL,filetC,sep=""))$status==500&HEAD(paste(URL,fileRH,sep=""))$status==500&HEAD(paste(URL,filetCdaybef,sep=""))$status==500&HEAD(paste(URL,fileRHdaybef,sep=""))$status==500) {
-      if (!(file.exists(paste("./Data/maps/",filetC,sep="")))) download.file(paste(URL,filetC,sep=""), destfile = paste("./Data/maps/",filetC,sep=""), method="auto")
-      if (!(file.exists(paste("./Data/maps/",fileRH,sep="")))) download.file(paste(URL,fileRH,sep=""), destfile = paste("./Data/maps/",fileRH,sep=""), method="auto")
-      if (!(file.exists(paste("./Data/maps/",filetCdaybef,sep="")))) download.file(paste(URL,filetCdaybef,sep=""), destfile = paste("./Data/maps/",filetCdaybef,sep=""), method="auto")
-      if (!(file.exists(paste("./Data/maps/",fileRHdaybef,sep="")))) download.file(paste(URL,fileRHdaybef,sep=""), destfile = paste("./Data/maps/",fileRHdaybef,sep=""), method="auto")
-      break 
+    fileInZip = list(TempDayBefore = paste("TEMP1H_",rep(as.character(format(Date-1, "%d%m%Y")),11),"_fcst_DIA1",13:23,"HLC.tif",sep=""),
+                      TempCurrentDay = paste("TEMP1H_",rep(as.character(format(Date, "%d%m%Y")),11),"_fcst_DIA1",c("00","01","02","03","04","05","06","07","08","09","10","11","12"),"HLC.tif",sep=""),
+                      RHDayBefore = paste("RH1H_",rep(as.character(format(Date-1, "%d%m%Y")),11),"_fcst_DIA1",13:23,"HLC.tif",sep=""),
+                      RHCurrentDay = paste("RH1H_",rep(as.character(format(Date, "%d%m%Y")),11),"_fcst_DIA1",c("00","01","02","03","04","05","06","07","08","09","10","11","12"),"HLC.tif",sep=""))
+    fileInDir = lapply (fileInZip, function(x) paste("./Data/maps/",x,sep="") )
+    zipfile = list(TempDayBefore = paste("geoTIFFtemphorario",as.character(format(Date-1, "%d%m%Y")),"00Z.zip",sep=""),
+                   TempCurrentDay = paste("geoTIFFtemphorario",as.character(format(Date, "%d%m%Y")),"00Z.zip",sep=""),
+                   RHDayBefore = paste("geoTIFFhumedadhorario",as.character(format(Date-1, "%d%m%Y")),"00Z.zip",sep=""),
+                   RHCurrentDay = paste("geoTIFFhumedadhorario",as.character(format(Date, "%d%m%Y")),"00Z.zip",sep=""))
+    zipfileInURL = lapply (zipfile, function(x) paste(URL,x,sep="") )
+    zipfileInDir = lapply (zipfile, function(x) paste("./Data/maps/",x,sep="") )
+    for (typeOfData in names(fileInZip))
+    {
+      if (!all(file.exists(fileInDir[[typeOfData]]))) {
+        if (!file.exists(zipfile[[typeOfData]])) repeat {
+          if (try(download.file(url = zipfileInURL[[typeOfData]], destfile = zipfileInDir[[typeOfData]], method="auto"))==0) break
+        }
+        unzip(zipfile = zipfileInDir[[typeOfData]],files = fileInZip[[typeOfData]],exdir = "./Data/maps/")
+      }
     }
-    warning(paste("couldn't download RH and mean T for ",Date," and ",Date-1,", trying ",Date-1," and ",Date-2," instead...",sep="") )
+    warning(paste("couldn't get RH and mean T for ",Date," and ",Date-1,", trying ",Date-1," and ",Date-2," instead...",sep="") )
     Date=Date-1
   }
-  filesToExtractTempDayBefore <- paste("TEMP1H_",rep(as.character(format(Date-1, "%d%m%Y")),11),"_fcst_DIA1",13:23,"HLC.tif",sep="")
-  unzip(zipfile = paste("./Data/maps/",filetCdaybef,sep=""),files = filesToExtractTempDayBefore, exdir = "./Data/maps/")
-  filesToExtractTempCurrentDay <- paste("TEMP1H_",rep(as.character(format(Date, "%d%m%Y")),11),"_fcst_DIA1",c("00","01","02","03","04","05","06","07","08","09","10","11","12"),"HLC.tif",sep="")
-  unzip(zipfile = paste("./Data/maps/",filetC,sep=""),files = filesToExtractTempCurrentDay, exdir = "./Data/maps/")
-  filesToExtractRHDayBefore <- paste("RH1H_",rep(as.character(format(Date-1, "%d%m%Y")),11),"_fcst_DIA1",13:23,"HLC.tif",sep="")
-  unzip(zipfile = paste("./Data/maps/",fileRHdaybef,sep=""),files = filesToExtractRHDayBefore, exdir = "./Data/maps/")
-  filesToExtractRHCurrentDay <- paste("RH1H_",rep(as.character(format(Date, "%d%m%Y")),11),"_fcst_DIA1",c("00","01","02","03","04","05","06","07","08","09","10","11","12"),"HLC.tif",sep="")
-  unzip(zipfile = paste("./Data/maps/",fileRH,sep=""),files = filesToExtractRHCurrentDay, exdir = "./Data/maps/")
-  tCstack <- stack(paste("./Data/maps/",files=c(filesToExtractTempDayBefore,filesToExtractTempCurrentDay),sep=""))
-  RHstack <- stack(paste("./Data/maps/",files=c(filesToExtractRHDayBefore,filesToExtractRHCurrentDay),sep=""))
+  TempFiles = paste("./Data/maps/",c(paste("TEMP1H_",rep(as.character(format(Date-1, "%d%m%Y")),11),"_fcst_DIA1",13:23,"HLC.tif",sep=""),
+                                     paste("TEMP1H_",rep(as.character(format(Date, "%d%m%Y")),11),"_fcst_DIA1",c("00","01","02","03","04","05","06","07","08","09","10","11","12"),"HLC.tif",sep="")),
+                    sep="")
+  RHFiles = paste("./Data/maps/",c(paste("RH1H_",rep(as.character(format(Date-1, "%d%m%Y")),11),"_fcst_DIA1",13:23,"HLC.tif",sep=""),
+                                     paste("RH1H_",rep(as.character(format(Date, "%d%m%Y")),11),"_fcst_DIA1",c("00","01","02","03","04","05","06","07","08","09","10","11","12"),"HLC.tif",sep="")),
+                    sep="")
+  tCstack <- stack(TempFiles)
+  RHstack <- stack(RHFiles)
   blightMap = RHstack[[1]]
   tCarray <- values(tCstack)
   RHarray <- values(RHstack)
@@ -321,6 +328,8 @@ plotBlightMap <- function(blightMap, coords){
   Colombia = readOGR(dsn = "Data/maps/",layer = "country")
   plot(Colombia,add=TRUE)
 }
+<<<<<<< HEAD
+=======
 
 bligthMapS <- blightRMapFromDownloadedDate(resistance="S")
 bligthMapR <- blightRMapFromDownloadedDate(resistance="R")
@@ -331,3 +340,4 @@ getBlight <- function(resistance){
   else if(resistance =="R") bligthMapR
   else if(resistance =="MS") bligthMapMS
 }
+>>>>>>> 0962f360891eb07fda71f645eb17d8f2b2605a7b
