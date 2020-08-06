@@ -1,16 +1,16 @@
-# setwd("/Users/josedanielcardenasrincon/Desktop/map.agromakers/R-space")
-# setwd("/home/dupas/map.agromakers/R-space/")
-setwd("/var/www/interactiveBlightMap/R-space")
+setwd("/Users/josedanielcardenasrincon/Desktop/interactiveBlightMap/R-space")
+#setwd("/home/dupas/map.agromakers/R-space/")
+#setwd("/var/www/interactiveBlightMap/R-space")
 
 source("lateBlightMap.R")
 library(shiny)
 
-maps <- blightRMapListFOr7daysSinceDate()
+maps <- loadMaps()
 
 # Define UI for application that draws a map
 ui <- fluidPage(
   # App title ----
-  titlePanel("Agromakers - Información sobre riesgo del tizón tardio para hoy"),
+  titlePanel(paste("Agromakers - Información sobre riesgo del tizón tardio para hoy ", Sys.Date())),
   # Sidebar layout with a input and output definitions ----
   sidebarLayout(
     # Sidebar panel for inputs ----
@@ -22,13 +22,13 @@ ui <- fluidPage(
                     "Resistente" = "R",
                     "Moderada" = "MS")),
       selectInput("dia", "Seleccionar día",
-                  c("Día 1" = "1",
-                    "Día 2" = "2",
-                    "Día 3" = "3",
-                    "Dia 4" = "4",
-                    "Día 5" = "5",
-                    "Día 6" = "6",
-                    "Día 7" = "7")),
+                  c("Hoy" = "1",
+                    "Mañana" = "2",
+                    "En 2 días" = "3",
+                    "En 3 días" = "4",
+                    "En 4 días" = "5",
+                    "En 5 días" = "6",
+                    "En 6 días" = "7")),
       h4("Predicción de severidad de los ataques en la coordenada Blight Units (Grünwald 2002)"),
       verbatimTextOutput("value")
     ),
@@ -37,7 +37,6 @@ ui <- fluidPage(
     )
   )
 )
-
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
