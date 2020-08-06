@@ -23,159 +23,16 @@
 # license       : GPL2;
 ##############################################################################
 
-# Select the resistance level that should be run
-
-resistance = "S"
-#resistance = "MS"
-#resistance = "R"
+#setwd("/Users/josedanielcardenasrincon/Desktop/interactiveBlightMap/R-space")
+#setwd("/home/dupas/map.agromakers/R-space/")
+setwd("/var/www/interactiveBlightMap/R-space")
 
 # Load libraries ---------------------------------------------------------------
 
-library(readr)
-#library(chron)
 library(raster)
 library(httr)
 library(rgdal)
 library(sp)
-
-
-ConsR <- NULL
-DayR <- NULL
-blightR <- NULL
-
-# Run this function to generate blight unit calculations for the HUSWO data set
-DailyBlightUnitFiles <- function() {
-  
-  files <- list.files("Data/in", pattern = ".csv$", full.names =  TRUE)
-  for (i in files) {
-    #weather_data <- as.data.frame(read_tsv(i))
-    weather_data <- read.csv(i, sep=";",header=TRUE)
-    #weather_data[, 6:7] <- round(weather_data[, 6:7], 1)
-    #colnames(weather_data) <-
-    #c("stationID",
-    # "date",
-    #"year",
-    #"month",
-    #"day",
-    #"hour",
-    #"temperature",
-    #"relativeHumidity")
-    blight_calcs <-
-      DayR(weather_data = weather_data,
-           min_year = 2019,
-           max_year = 2019)
-    Date <-
-      paste(blight_calcs$oYear,
-            blight_calcs$oMonth,
-            blight_calcs$oDay,
-            sep = "-")
-    weather_data <- cbind(Date, blight_calcs)
-    weather_data <- subset(weather_data, oYear >= 1)
-    if (resistance == "S") {
-      resistance <- "susceptible"
-    } else if (resistance == "MS") {
-      resistance <- "moderate"
-    } else
-      resistance <- "resistant"
-    filename <- paste0(basename(i), resistance, "_dayR.txt")
-    write_tsv(
-      weather_data,
-      path = paste0("Cache/Blight Units/", filename),
-      col_names = FALSE,
-      append = FALSE
-    )
-  }
-}
-
-DayR <- function(weather_data, min_year, max_year) {
-  ##Take all weather data and output blight units for a selected range of months.
-  ##This assumes that functions blightR and ConsR are available
-  nYear <- max_year - min_year + 1
-  oStation <-
-    0 * (1:(366 * nYear)) ##longer than 365 days to account for leap years
-  oYear <- oStation
-  oMonth <- oStation
-  oDay <- oStation
-  oBlight <- oStation
-  oC <- oStation
-  oRH <- oStation
-  chronos <- oStation
-  uStation <- unique(weather_data$stationID)
-  tC <- 0 * (1:24)
-  tRH <- 0 * (1:24)
-  globalIndex  <-  1
-  for (iStation in (uStation)) {
-    tStation = subset(weather_data, stationID == iStation)
-    for (iYear in (min_year:max_year)) {
-      tYear = subset(tStation, year == iYear)
-      umonth  =  unique(tYear$month)
-      for (i_month in (umonth)) {
-        t_month <- subset(tYear, month == i_month)
-        rh_test <- sum(t_month$relativeHumidity == 999)
-        t_test <- sum(t_month$temperature == 999.9)
-        
-        if (rh_test + t_test == 0) {
-          if (i_month  ==  4 |
-              i_month  ==  6 | i_month  ==  9 | i_month == 11)
-          {
-            maxDay = 30
-          } else
-            if (i_month  ==  2) {
-              if (iYear / 4 == round(iYear / 4)) {
-                maxDay = 29
-              } else {
-                maxDay = 28
-              }
-            } else {
-              maxDay = 31
-            }
-          for (iDay in (1:maxDay)) {
-            if (iYear < max_year | i_month < 12 | iDay < 31) {
-              # Hours are 13:00 - 23:00, 0:00 - 12:00
-              # Note that the last day of the last year is excluded
-              tDay <- subset(t_month, day == iDay)
-              tDay2 <- NULL
-              tC[1:12] <- tDay$temperature[13:24]
-              tRH[1:12] <- tDay$relativeHumidity[13:24]
-              if (iDay < maxDay) {
-                tDay2 <- subset(t_month, day == iDay + 1)
-              }else if (i_month < 12) {
-                t_month2 <- subset(tYear, month == i_month + 1)
-                tDay2 <- subset(t_month2, day == 1)
-              }else{
-                
-              }
-              
-              tC[13:24] <- tDay2$temperature[1:12]
-              tRH[13:24] <- tDay2$relativeHumidity[1:12]
-              if(sum(is.na(tC)) == 0 & sum(is.na(tRH)) == 0)
-              {
-              out1 <- ConsR(tC  =  tC, tRH  =  tRH)
-              out2 <-
-                blightR(consmc = out1$consmc,
-                        tcons = out1$tcons,
-                        resistance = resistance)
-              blight <- sum(out2)
-              oStation[globalIndex] <- iStation
-              oYear[globalIndex] <- iYear
-              oMonth[globalIndex] <- i_month
-              oDay[globalIndex] <- iDay
-              oBlight[globalIndex] <- blight
-              oC[globalIndex] <- mean(tC)
-              oRH[globalIndex] <- mean(tRH)
-              globalIndex <- globalIndex + 1
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  outDaily <-
-    data.frame(oStation, oYear, oMonth, oDay, oC, oRH, oBlight)
-  return(outDaily)
-}
-
 
 ConsR <- function(RH,tC) {
   # argument : tRHTC is a concathenated vector of RH from 1 pm to 12 am 
@@ -354,24 +211,47 @@ blightRMapListFOr7daysSinceDate <- function(Date=Sys.Date(), removeClimateData=F
     blightMaps[[resistance]]=list()
     for (Day in 1:7){
       TempFiles = paste("./Data/maps/",c(paste("TEMP1H_",rep(as.character(format(Date, "%d%m%Y")),11),"_fcst_DIA",(Day-1),13:23,"HLC.tif",sep=""),
-                                         paste("TEMP1H_",rep(as.character(format(Date, "%d%m%Y")),11),"_fcst_DIA",(Day),c("00","01","02","03","04","05","06","07","08","09","10","11","12"),"HLC.tif",sep="")),sep="")
+                                         paste("TEMP1H_",rep(as.character(format(Date, "%d%m%Y")),11),"_fcst_DIA",Day,c("00","01","02","03","04","05","06","07","08","09","10","11","12"),"HLC.tif",sep="")),sep="")
       RHFiles = paste("./Data/maps/",c(paste("RH1H_",rep(as.character(format(Date, "%d%m%Y")),11),"_fcst_DIA",(Day-1),13:23,"HLC.tif",sep=""),
-                                       paste("RH1H_",rep(as.character(format(Date, "%d%m%Y")),11),"_fcst_DIA",(Day),c("00","01","02","03","04","05","06","07","08","09","10","11","12"),"HLC.tif",sep="")),sep="")
+                                       paste("RH1H_",rep(as.character(format(Date, "%d%m%Y")),11),"_fcst_DIA",Day,c("00","01","02","03","04","05","06","07","08","09","10","11","12"),"HLC.tif",sep="")),sep="")
       tCstack <- stack(TempFiles)
       RHstack <- stack(RHFiles)
       blightMaps[[resistance]][[Day]] = RHstack[[1]]
       tCarray <- values(tCstack)
       RHarray <- values(RHstack)
       values(blightMaps[[resistance]][[Day]])=unlist(lapply(1:ncell(RHstack)[1],FUN=function(i){blightR(RH = RHarray[i,],tC = tCarray[i,],resistance = resistance)}))
+      temp=paste("prediction_day",Day,"_resistance",resistance,".grd",sep="")
+      writeRaster(blightMaps[[resistance]][[Day]], filename=file.path("./Data/maps/", temp), datatype='raster', overwrite=TRUE)
     }
-    if (removeClimateData) {
-      file.remove(paste("./Data/maps/",files=c(filesToExtractTempDayBefore,filesToExtractTempCurrentDay),sep=""))
-      file.remove(paste("./Data/maps/",files=c(filesToExtractRHDayBefore,filesToExtractRHCurrentDay),sep=""))
+  }
+  if (removeClimateData) {
+    for (Day in 1:7){
+      file.remove(paste("./Data/maps/","TEMP1H_",rep(as.character(format(Date, "%d%m%Y")),11),"_fcst_DIA",Day,(13:23),"HLC.tif",sep=""))
+      file.remove(paste("./Data/maps/","TEMP1H_",rep(as.character(format(Date, "%d%m%Y")),11),"_fcst_DIA",Day,c("00","01","02","03","04","05","06","07","08","09","10","11","12"),"HLC.tif",sep=""))
+      file.remove(paste("./Data/maps/","RH1H_",rep(as.character(format(Date, "%d%m%Y")),11),"_fcst_DIA",Day,13:23,"HLC.tif",sep=""))
+      file.remove(paste("./Data/maps/","RH1H_",rep(as.character(format(Date, "%d%m%Y")),11),"_fcst_DIA",Day,c("00","01","02","03","04","05","06","07","08","09","10","11","12"),"HLC.tif",sep=""))
     }
+  }
+  if (removeClimateData){
+    file.remove(paste("./Data/maps/","geoTIFFtemphorario",as.character(format(Date-1, "%d%m%Y")),"00Z.zip",sep=""))
+    file.remove(paste("./Data/maps/","geoTIFFtemphorario",as.character(format(Date, "%d%m%Y")),"00Z.zip",sep=""))
+    file.remove(paste("./Data/maps/","geoTIFFhumedadhorario",as.character(format(Date-1, "%d%m%Y")),"00Z.zip",sep=""))
+    file.remove(paste("./Data/maps/","geoTIFFhumedadhorario",as.character(format(Date, "%d%m%Y")),"00Z.zip",sep=""))
   }
   blightMaps
 }
 
+loadMaps <-function(){
+  blightMaps <- list()
+  for (resistance in (c("S","MS","R"))){
+    blightMaps[[resistance]]=list()
+    for (Day in 1:7){
+      temp=paste("Data/maps/prediction_day",Day,"_resistance",resistance,".grd",sep="")
+      blightMaps[[resistance]][[Day]] =raster(temp, package="raster")
+    }
+  }
+  blightMaps
+}
 
 plotBlightMap <- function(blightMap, coords){
   plot(blightMap)
@@ -380,13 +260,3 @@ plotBlightMap <- function(blightMap, coords){
   Colombia = readOGR(dsn = "Data/maps/",layer = "country")
   plot(Colombia,add=TRUE)
 }
-
-#bligthMapS <- blightRMapFromDownloadedDate(resistance="S")
-#bligthMapR <- blightRMapFromDownloadedDate(resistance="R")
-#bligthMapMS <- blightRMapFromDownloadedDate(resistance="MS")
-
-#getBlight <- function(resistance){
-#  if(resistance =="S") bligthMapS
-#  else if(resistance =="R") bligthMapR
-#  else if(resistance =="MS") bligthMapMS
-#}
