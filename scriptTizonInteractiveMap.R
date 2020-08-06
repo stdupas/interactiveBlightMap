@@ -1,6 +1,6 @@
-setwd("/Users/josedanielcardenasrincon/Desktop/interactiveBlightMap/R-space")
+#setwd("/Users/josedanielcardenasrincon/Desktop/interactiveBlightMap/R-space")
 #setwd("/home/dupas/map.agromakers/R-space/")
-#setwd("/var/www/interactiveBlightMap/R-space")
+setwd("/var/www/interactiveBlightMap/R-space")
 
 source("lateBlightMap.R")
 library(shiny)
