@@ -29,7 +29,7 @@ setwd("/srv/shiny-server/interactiveBlightMap/R-space")
 
 # Load libraries ---------------------------------------------------------------
 
-library(readr)
+#library(readr)
 library(raster)
 library(httr)
 library(rgdal)
