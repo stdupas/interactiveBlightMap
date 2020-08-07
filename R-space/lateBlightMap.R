@@ -25,7 +25,7 @@
 
 #setwd("/Users/josedanielcardenasrincon/Desktop/interactiveBlightMap/R-space")
 #setwd("/home/dupas/map.agromakers/R-space/")
-setwd("/var/www/interactiveBlightMap/R-space")
+setwd("/srv/shiny-server/interactiveBlightMap/R-space")
 
 # Load libraries ---------------------------------------------------------------
 
