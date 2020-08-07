@@ -23,9 +23,9 @@
 # license       : GPL2;
 ##############################################################################
 
-#setwd("/Users/josedanielcardenasrincon/Desktop/interactiveBlightMap/R-space")
+setwd("/Users/josedanielcardenasrincon/Desktop/interactiveBlightMap/R-space")
 #setwd("/home/dupas/map.agromakers/R-space/")
-setwd("/srv/shiny-server/interactiveBlightMap/R-space")
+#setwd("/srv/shiny-server/interactiveBlightMap/R-space")
 
 # Select the resistance level that should be run
 

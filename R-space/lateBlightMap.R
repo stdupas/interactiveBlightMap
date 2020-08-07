@@ -29,6 +29,7 @@ setwd("/srv/shiny-server/interactiveBlightMap/R-space")
 
 # Load libraries ---------------------------------------------------------------
 
+library(readr)
 library(raster)
 library(httr)
 library(rgdal)
@@ -225,7 +226,7 @@ blightRMapListFOr7daysSinceDate <- function(Date=Sys.Date(), removeClimateData=F
     }
   }
   if (removeClimateData) {
-    for (Day in 1:7){
+    for (Day in 0:7){
       file.remove(paste("./Data/maps/","TEMP1H_",rep(as.character(format(Date, "%d%m%Y")),11),"_fcst_DIA",Day,(13:23),"HLC.tif",sep=""))
       file.remove(paste("./Data/maps/","TEMP1H_",rep(as.character(format(Date, "%d%m%Y")),11),"_fcst_DIA",Day,c("00","01","02","03","04","05","06","07","08","09","10","11","12"),"HLC.tif",sep=""))
       file.remove(paste("./Data/maps/","RH1H_",rep(as.character(format(Date, "%d%m%Y")),11),"_fcst_DIA",Day,13:23,"HLC.tif",sep=""))
