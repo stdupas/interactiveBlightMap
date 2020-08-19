@@ -15,7 +15,7 @@ ui <- fluidPage(
   sidebarLayout(
     # Sidebar panel for inputs ----
     sidebarPanel(
-      numericInput("caption1", "Longitud de la parcela (X)", -75),
+      numericInput("caption1", "Longitud de la parcela (X)", -73),
       numericInput("caption2", "Latitud de la parcela (Y)", 5),
       selectInput("resistencia", "Seleccionar resistencia varietal",
                   c("Susceptible" = "S",
