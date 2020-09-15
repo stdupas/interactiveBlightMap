@@ -2,3 +2,5 @@
 .Rapp.history
 .Rhistory
 .DS_Store
+*.grd
+*.gri
