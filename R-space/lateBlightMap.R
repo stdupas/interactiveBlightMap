@@ -23,9 +23,9 @@
 # license       : GPL2;
 ##############################################################################
 
-#setwd("/Users/josedanielcardenasrincon/Desktop/interactiveBlightMap/R-space")
+setwd("/Users/josedanielcardenasrincon/Documents/GitHub/interactiveBlightMap/R-space")
 #setwd("/home/dupas/map.agromakers/R-space/")
-setwd("/srv/shiny-server/interactiveBlightMap/R-space")
+#setwd("/srv/shiny-server/interactiveBlightMap/R-space")
 
 # Load libraries ---------------------------------------------------------------
 
